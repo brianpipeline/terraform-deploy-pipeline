@@ -25,6 +25,19 @@ steps:
         createCloudStorageBucket "$_GIT_REPOSITORY_NAME" "$_REPLY_TOPIC"
 
   - name: "us-central1-docker.pkg.dev/cloud-build-pipeline-396819/cloud-build-helper-docker/cloud-build-helper-docker:latest"
+    id: "Terraform init, plan, and apply"
+    entrypoint: "bash"
+    dir: "${_GIT_REPOSITORY_NAME}"
+    args:
+      - "-eEuo"
+      - "pipefail"
+      - "-c"
+      - |-
+        #!/bin/bash
+        source tf-init-plan-apply.sh
+        runTfInitPlanApply "$_GIT_REPOSITORY_NAME" "$_REPLY_TOPIC"
+
+  - name: "us-central1-docker.pkg.dev/cloud-build-pipeline-396819/cloud-build-helper-docker/cloud-build-helper-docker:latest"
     id: "Reply back to pipeline"
     entrypoint: "bash"
     args:
