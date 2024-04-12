@@ -2,4 +2,3 @@ type: "cloudbuild-deploy"
 pipelineType: "pubsub"
 pipelineName: "terraform-deploy"
 
-
