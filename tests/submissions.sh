@@ -11,7 +11,7 @@ if ! gcloud pubsub subscriptions create "$subscriptionName" --topic "$topicName"
     echo "Subscription $subscriptionName already exists"
 fi
 
-gcloud builds submit . --config cloudbuild.yaml --substitutions "_GIT_CLONE_URL=https://github.com/brianpipeline/test-terraform.git,_GIT_REPOSITORY_NAME="test-terraform",_GIT_REF="refs/heads/main",_GIT_HEAD_SHA="ee163d212fa06f111f2f2c133d4b3bbb42035e55",_REPLY_TOPIC=\"projects/cloud-build-pipeline-396819/topics/$topicName\"" --region=us-central1
+gcloud builds submit . --config cloudbuild.yaml --substitutions "_GIT_CLONE_URL=https://github.com/brianpipeline/test-terraform.git,_GIT_REPOSITORY_NAME="test-terraform",_GIT_REF="refs/heads/main",_GIT_HEAD_SHA="291b8bc0a190c886acee58ab8386cf3e6d86493d",_REPLY_TOPIC=\"projects/cloud-build-pipeline-396819/topics/$topicName\"" --region=us-central1
 
 message=$(gcloud pubsub subscriptions pull --auto-ack "$subscriptionName" --format='value(message.data)' 2>/dev/null)
 gcloud pubsub topics delete "$topicName"
