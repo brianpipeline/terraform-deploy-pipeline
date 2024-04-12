@@ -1,0 +1,45 @@
+steps:
+  - name: "us-central1-docker.pkg.dev/cloud-build-pipeline-396819/cloud-build-helper-docker/cloud-build-helper-docker:latest"
+    id: "Clone repo"
+    entrypoint: "bash"
+    args:
+      - "-eEuo"
+      - "pipefail"
+      - "-c"
+      - |-
+        #!/bin/bash
+        source git-clone-and-checkout.sh
+        cloneAndCheckoutBranch "$_GIT_CLONE_URL" "$_GIT_REPOSITORY_NAME" "$_GIT_REF" "$_GIT_HEAD_SHA"
+
+  - name: "us-central1-docker.pkg.dev/cloud-build-pipeline-396819/cloud-build-helper-docker/cloud-build-helper-docker:latest"
+    id: "Create Cloud Storage bucket"
+    entrypoint: "bash"
+    dir: "${_GIT_REPOSITORY_NAME}"
+    args:
+      - "-eEuo"
+      - "pipefail"
+      - "-c"
+      - |-
+        #!/bin/bash
+        source create-cloud-storage-bucket.sh
+        createCloudStorageBucket "$_GIT_REPOSITORY_NAME" "$_REPLY_TOPIC"
+
+  - name: "us-central1-docker.pkg.dev/cloud-build-pipeline-396819/cloud-build-helper-docker/cloud-build-helper-docker:latest"
+    id: "Reply back to pipeline"
+    entrypoint: "bash"
+    args:
+      - "-eEuo"
+      - "pipefail"
+      - "-c"
+      - |-
+        #!/bin/bash
+        source send-message.sh
+        sendMessage "$_REPLY_TOPIC" "Pipeline succeeded."
+options:
+  substitutionOption: "ALLOW_LOOSE"
+substitutions:
+  _GIT_CLONE_URL: $(body.message.data.git.clone_url)
+  _GIT_REPOSITORY_NAME: $(body.message.data.git.name)
+  _GIT_REF: $(body.message.data.git.ref)
+  _GIT_HEAD_SHA: $(body.message.data.git.head_sha)
+  _REPLY_TOPIC: $(body.message.data.reply_topic)
